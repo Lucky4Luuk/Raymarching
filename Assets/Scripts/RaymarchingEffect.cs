@@ -14,8 +14,13 @@ public sealed class RaymarchingRenderer : PostProcessEffectRenderer<Raymarching>
 {
     public override void Render(PostProcessRenderContext context)
     {
+        var camera = context.camera;
+        var vp = camera.projectionMatrix * camera.worldToCameraMatrix;
+
         var sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/Raymarching"));
         // sheet.properties.SetFloat("_Blend", settings.blend);
+        sheet.properties.SetVector("_CameraPosition", camera.transform.position);
+        sheet.properties.SetMatrix("_ViewProjectInverse", vp.inverse);
         context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
     }
 }

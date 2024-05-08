@@ -11,13 +11,15 @@ Shader "Hidden/Custom/Raymarching"
         TEXTURE2D_SAMPLER2D(_CameraDepthTexture, sampler_CameraDepthTexture);
 
         float4 _CameraPosition;
-        float4x4 _ViewProjectInverse;
+        float4x4 _CameraFrustum;
+        float4x4 _CameraWorldSpace;
 
         struct v2f {
             float4 vertex : SV_POSITION;
             float3 worldPos : TEXCOORD0;
             float2 texcoord : TEXCOORD1;
             float2 texcoordStereo : TEXCOORD2;
+            float4 ray : TEXCOORD3;
         };
 
         struct appdata {
@@ -31,26 +33,25 @@ Shader "Hidden/Custom/Raymarching"
             o.vertex = float4(v.vertex.xy, 0.0, 1.0);
             o.texcoord = TransformTriangleVertexToUV(v.vertex.xy);
 
+            int index = (o.texcoord.x / 2) + o.texcoord.y;
+            o.ray = _CameraFrustum[index];
+
             #if UNITY_UV_STARTS_AT_TOP
                 o.texcoord = o.texcoord * float2(1.0, -1.0) + float2(0.0, 1.0);
             #endif
 
             o.texcoordStereo = TransformStereoScreenSpaceTex(o.texcoord, 1.0);
+
             return o;
         }
 
         float4 Frag(v2f i) : SV_Target
         {
             float3 ro = _CameraPosition.xyz;
-            float3 rd = normalize(i.worldPos);
-            float4 color = float4(rd, 1.0);
-            // float4 color = float4(i.worldPos, 1.0);
-            // float4 color = SAMPLE_TEXTURE2D(_CameraDepthTexture, sampler_CameraDepthTexture, i.texcoord);
-            // float depth = SAMPLE_TEXTURE2D(_CameraDepthTexture, sampler_CameraDepthTexture, i.texcoord).a;
-            // depth = LinearEyeDepth(depth);
-            // float4 color = float4(depth, depth, depth, 1.0);
-            // float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
-            // color = test(color);
+            float3 rd = normalize(i.ray);
+            // float4 color = float4(rd, 1.0);
+            float4 color = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, i.texcoord);
+            color = calc(color, ro, rd);
             return color;
         }
 

@@ -15,7 +15,8 @@ Shader "Hidden/Custom/Raymarching"
         float4x4 _CameraFrustum;
         float4x4 _CameraWorldSpace;
 
-        float4 _SDFs[SDF_ARR_SIZE];
+        // float4 _SDFs[SDF_ARR_SIZE];
+        StructuredBuffer<float4> _SDFs;
         int _SDFCount;
 
         #include "Assets/Shaders/RtLib.hlsl"
@@ -51,8 +52,7 @@ Shader "Hidden/Custom/Raymarching"
             return o;
         }
 
-        float4 Frag(v2f i) : SV_Target
-        {
+        float4 Frag(v2f i) : SV_Target {
             float3 ro = _CameraPosition.xyz;
             float3 rd = normalize(i.ray);
             // float4 color = float4(rd, 1.0);

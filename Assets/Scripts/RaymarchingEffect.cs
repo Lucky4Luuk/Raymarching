@@ -26,15 +26,16 @@ public sealed class RaymarchingRenderer : PostProcessEffectRenderer<Raymarching>
         sheet.properties.SetMatrix("_CameraFrustum", FrustumCorners(camera));
         sheet.properties.SetMatrix("_CameraWorldSpace", camera.cameraToWorldMatrix);
 
-        int i = 0;
-        Vector4[] data = new Vector4[64];
+        List<Vector4> data = new List<Vector4>();
         foreach (SDF sdf in SDF.FindObjectsByType<SDF>(FindObjectsSortMode.None)) {
-            data[i] = new Vector4((float)((int)sdf.kind), 1f, 1f, 1f);
-            data[i+1] = new Vector4(sdf.gameObject.transform.position.x, sdf.gameObject.transform.position.y, sdf.gameObject.transform.position.z, 0f);
-            i += 2;
+            data.Add(new Vector4((float)((int)sdf.kind), 1f, 1f, 1f));
+            data.Add(new Vector4(sdf.gameObject.transform.position.x, sdf.gameObject.transform.position.y, sdf.gameObject.transform.position.z, 0f));
         }
-        sheet.properties.SetVectorArray("_SDFs", data);
-        sheet.properties.SetInteger("_SDFCount", data.Length);
+        var count = data.Count;
+        var buffer = new ComputeBuffer(count * 2, sizeof(float) * 4, ComputeBufferType.Default);
+        buffer.SetData(data, 0, 0, count);
+        sheet.properties.SetBuffer("_SDFs", buffer);
+        sheet.properties.SetInteger("_SDFCount", count);
 
         context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
     }

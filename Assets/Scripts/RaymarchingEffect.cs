@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering.PostProcessing;
 
@@ -19,10 +21,21 @@ public sealed class RaymarchingRenderer : PostProcessEffectRenderer<Raymarching>
         var vp = camera.projectionMatrix * camera.worldToCameraMatrix;
 
         var sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/Raymarching"));
-        // sheet.properties.SetFloat("_Blend", settings.blend);
+
         sheet.properties.SetVector("_CameraPosition", camera.transform.position);
         sheet.properties.SetMatrix("_CameraFrustum", FrustumCorners(camera));
         sheet.properties.SetMatrix("_CameraWorldSpace", camera.cameraToWorldMatrix);
+
+        int i = 0;
+        Vector4[] data = new Vector4[64];
+        foreach (SDF sdf in SDF.FindObjectsByType<SDF>(FindObjectsSortMode.None)) {
+            data[i] = new Vector4((float)((int)sdf.kind), 1f, 1f, 1f);
+            data[i+1] = new Vector4(sdf.gameObject.transform.position.x, sdf.gameObject.transform.position.y, sdf.gameObject.transform.position.z, 0f);
+            i += 2;
+        }
+        sheet.properties.SetVectorArray("_SDFs", data);
+        sheet.properties.SetInteger("_SDFCount", data.Length);
+
         context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
     }
 

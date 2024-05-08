@@ -1,9 +1,36 @@
+float opU(float a, float b) {
+    return min(a, b);
+}
+
 float sdSphere(float3 p, float r) {
     return length(p) - r;
 }
 
 float map(float3 p) {
-    return sdSphere(p, 0.5);
+    // return sdSphere(p, 0.5);
+    float d = 9999.0;
+
+    for (int i = 0; i < SDF_ARR_SIZE; i += 2) {
+        if (i >= _SDFCount * 2) break;
+        float4 dataA = _SDFs[i];
+        float4 dataB = _SDFs[i+1];
+
+        int kind = int(dataA.x);
+        float3 oScale = dataA.yzw;
+        float3 oPos = dataB.xyz;
+
+        float3 rayPos = (p - oPos) / oScale;
+
+        // TODO: Test performance difference between [call] and [forceswitch]
+        [call] switch (i) {
+            default:
+            case 0:
+                d = opU(d, sdSphere(rayPos, 1));
+                break;
+        }
+    }
+
+    return d;
 }
 
 struct RayHit {

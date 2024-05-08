@@ -26,9 +26,11 @@ public sealed class RaymarchingRenderer : PostProcessEffectRenderer<Raymarching>
         sheet.properties.SetMatrix("_CameraFrustum", FrustumCorners(camera));
         sheet.properties.SetMatrix("_CameraWorldSpace", camera.cameraToWorldMatrix);
 
+        // TODO: Generate the ComputeBuffer once, and then use Transform.hasChanged to
+        //       only update the changes.
         List<Vector4> data = new List<Vector4>();
         foreach (SDF sdf in SDF.FindObjectsByType<SDF>(FindObjectsSortMode.None)) {
-            data.Add(new Vector4((float)((int)sdf.kind), 1f, 1f, 1f));
+            data.Add(new Vector4((float)((int)sdf.kind), sdf.gameObject.transform.lossyScale.x, sdf.gameObject.transform.lossyScale.y, sdf.gameObject.transform.lossyScale.z));
             data.Add(new Vector4(sdf.gameObject.transform.position.x, sdf.gameObject.transform.position.y, sdf.gameObject.transform.position.z, 0f));
         }
         var count = data.Count;

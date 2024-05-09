@@ -483,6 +483,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kind: 0
+  material: {fileID: 11400000, guid: 2a382217b9da3e842bab912f8a937362, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

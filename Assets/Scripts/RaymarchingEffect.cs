@@ -32,9 +32,16 @@ public sealed class RaymarchingRenderer : PostProcessEffectRenderer<Raymarching>
         foreach (SDF sdf in SDF.FindObjectsByType<SDF>(FindObjectsSortMode.None)) {
             data.Add(new Vector4((float)((int)sdf.kind), sdf.gameObject.transform.lossyScale.x, sdf.gameObject.transform.lossyScale.y, sdf.gameObject.transform.lossyScale.z));
             data.Add(new Vector4(sdf.gameObject.transform.position.x, sdf.gameObject.transform.position.y, sdf.gameObject.transform.position.z, 0f));
+            Vector4 matData = new Vector4(1f, 1f, 1f, 1f);
+            if (sdf.material != null) {
+                // Convert the RGB values to 2 values by treating them as cartesian
+                // coordinates and converting them to polar coordinates.
+                matData = new Vector4(sdf.material.albedo.r, sdf.material.albedo.g, sdf.material.albedo.b, 1f);
+            }
+            data.Add(matData);
         }
         var count = data.Count;
-        var buffer = new ComputeBuffer(count * 2, sizeof(float) * 4, ComputeBufferType.Default);
+        var buffer = new ComputeBuffer(count * 3, sizeof(float) * 4, ComputeBufferType.Default);
         buffer.SetData(data, 0, 0, count);
         sheet.properties.SetBuffer("_SDFs", buffer);
         sheet.properties.SetInteger("_SDFCount", count);

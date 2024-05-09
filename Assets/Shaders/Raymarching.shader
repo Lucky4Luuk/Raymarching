@@ -6,7 +6,7 @@ Shader "Hidden/Custom/Raymarching"
 
         #define UNITY_MATRIX_MVP mul(unity_MatrixVP, unity_ObjectToWorld)
 
-        #define SDF_ARR_SIZE 64
+        #define SDF_ARR_SIZE 96
 
         TEXTURE2D_SAMPLER2D(_MainTex, sampler_MainTex);
         TEXTURE2D_SAMPLER2D(_CameraDepthTexture, sampler_CameraDepthTexture);
@@ -36,7 +36,7 @@ Shader "Hidden/Custom/Raymarching"
         v2f Vert(appdata v) {
             v2f o;
 
-            o.worldPos = mul (transpose(UNITY_MATRIX_MVP), v.vertex);
+            o.worldPos = mul(transpose(UNITY_MATRIX_MVP), v.vertex);
             o.vertex = float4(v.vertex.xy, 0.0, 1.0);
             o.texcoord = TransformTriangleVertexToUV(v.vertex.xy);
 

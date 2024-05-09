@@ -5,6 +5,7 @@ using UnityEngine;
 public class SDF : MonoBehaviour
 {
     public SDFType kind;
+    public SDFMaterial material;
 
     // Start is called before the first frame update
     void Start()

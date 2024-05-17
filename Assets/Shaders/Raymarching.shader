@@ -14,6 +14,7 @@ Shader "Hidden/Custom/Raymarching"
         float4 _CameraPosition;
         float4x4 _CameraFrustum;
         float4x4 _CameraWorldSpace;
+        float3 _LightDirection;
 
         // float4 _SDFs[SDF_ARR_SIZE];
         StructuredBuffer<float4> _SDFs;

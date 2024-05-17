@@ -19,6 +19,8 @@ public sealed class RaymarchingRenderer : PostProcessEffectRenderer<Raymarching>
         var camera = context.camera;
         var v = camera.worldToCameraMatrix;
         var vp = camera.projectionMatrix * camera.worldToCameraMatrix;
+        // var rmSettings = camera.gameObject.GetComponent<RaymarchingSettings>();
+        var rmSettings = RaymarchingSettings.FindObjectsByType<RaymarchingSettings>(FindObjectsSortMode.None)[0];
 
         var sheet = context.propertySheets.Get(Shader.Find("Hidden/Custom/Raymarching"));
 
@@ -45,6 +47,8 @@ public sealed class RaymarchingRenderer : PostProcessEffectRenderer<Raymarching>
         buffer.SetData(data, 0, 0, count);
         sheet.properties.SetBuffer("_SDFs", buffer);
         sheet.properties.SetInteger("_SDFCount", count);
+
+        sheet.properties.SetVector("_LightDirection", -rmSettings.directionalLight.forward);
 
         context.command.BlitFullscreenTriangle(context.source, context.destination, sheet, 0);
     }
